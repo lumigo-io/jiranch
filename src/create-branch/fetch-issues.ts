@@ -4,10 +4,10 @@ import ora from "ora";
 
 const ninjaFilterID = 10047;
 
-function resolveJql({ninja, allIssues}: InlineConfig, sprint: number) {
+function resolveJql({ninja, allIssues}: InlineConfig) {
     const {userId} = getConfig();
     let jql = `search?jql=`;
-    jql += ninja ? `filter=${ninjaFilterID}` : `Sprint = ${sprint} AND assignee in (${userId})`;
+    jql += ninja ? `filter=${ninjaFilterID}` : `assignee in (${userId})`;
     if (!allIssues) {
         // Filter done issues
         jql += ' AND status not in ("Will not fix", Done)';
@@ -19,7 +19,7 @@ function resolveJql({ninja, allIssues}: InlineConfig, sprint: number) {
 
 export async function fetchIssues(config: InlineConfig, sprint: number) {
     const loadingIssues = ora(config.ninja ? 'Loading Ninja issues' : 'Loading sprint issues...').start();
-    const url = jiraApi(resolveJql(config, sprint));
+    const url = jiraApi(resolveJql(config));
     const fetch = require('node-fetch');
 
     const { issues } = await fetch(url, {
